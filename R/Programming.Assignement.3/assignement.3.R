@@ -1,4 +1,4 @@
-# 7ot badela best.R li 3ala pc labo taba3ak..
+# 7ot badela best.R li 3ala pc labo taba3ak! 
 best<- function (state,outcome) {
         outcome.data<- read.table("~/Github/datasciencecoursera/R/Programming.Assignement.3/outcome-of-care-measures.csv",
                                   header=T,
