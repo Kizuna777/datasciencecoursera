@@ -106,11 +106,11 @@ rankall<- function (outcome,num="best") {
         y<-is.na(y)
                 if (y==TRUE) {
                         stop("invalid outcome")
-} 
+        } 
         outcome.data.1<-outcome.data[,c("State", "Hospital.Name", outcome.p)]
         good<-complete.cases(outcome.data.1[,outcome.p])
- 
         outcome.data.1<-outcome.data.1[good,]
+        outcome.data.1<-outcome.data.1[order(outcome.data.1$Hospital.Name),]
         outcome.data.2=transform(outcome.data.1, 
                          rankouk=ave(outcome.data.1[,3],outcome.data.1[,1],
                                      FUN= function(x) rank(x,
@@ -120,109 +120,29 @@ rankall<- function (outcome,num="best") {
                 function(outcome.data.2.sp) subset(outcome.data.2.sp,
                           rankouk==num,
                           select=c("Hospital.Name","State","rankouk")))    
-       ses.1<-ldply(ses,data.frame)
+        ses.1<-ldply(ses,data.frame)
         if(num=="best"){
         ses=lapply(outcome.data.2.sp, 
                 function(outcome.data.2.sp) subset(outcome.data.2.sp,
                                                         rankouk==1,
                                                         select=c("Hospital.Name","State","rankouk")))    
                 ses.1<-ldply(ses,data.frame)
-                
-                
                 } 
-        
-        write.table(ses.1[,1:3],file="ok.7",sep="\t")
-******************************************************************************************************
-
-rankall<- function (outcome,num="best") {
-        outcome.data<- read.table("outcome-of-care-measures.csv",
-                                  header=T,
-                                  na.strings ="NA", 
-                                  sep=",")
-        suppressWarnings(outcome.data[,c(11:46)] <- sapply(c(11:46), function(X) {
-                outcome.data[,X] <- as.numeric(
-                        gsub("Not Available",
-                             NA,
-                             outcome.data[,X])
-                )
-        }))
-        outcome.p<-paste("Hospital.30.Day.Death..Mortality..Rates.from",
-                         outcome,
-                         sep=".")
-        outcome.p.col<-match(outcome.p,names(outcome.data)) 
-        y<-outcome.p.col
-        y<-is.na(y)
-        if (y==TRUE) {
-                stop("invalid outcome")
-        } 
-        outcome.data.1<-outcome.data[,c("State", "Hospital.Name", outcome.p)]
-        good<-complete.cases(outcome.data.1[,outcome.p])
-        
-        outcome.data.1<-outcome.data.1[good,]
-        outcome.data.2=transform(outcome.data.1, 
-                                 rankouk=ave(outcome.data.1[,3],outcome.data.1[,1],
-                                             FUN= function(x) rank(x,
-                                                                   ties.method="first")))
-        outcome.data.2.sp<-split(outcome.data.2,outcome.data.2$State) 
-        ses=lapply(outcome.data.2.sp, 
-                   function(outcome.data.2.sp) subset(outcome.data.2.sp,
-                                                      rankouk==num,
-                                                      select=c("Hospital.Name","State","rankouk")))    
-        ses.1<-ldply(ses,data.frame)
-        if(num=="best"){
-                ses=lapply(outcome.data.2.sp, 
-                           function(outcome.data.2.sp) subset(outcome.data.2.sp,
-                                                              rankouk==1,
-                                                              select=c("Hospital.Name","State","rankouk")))    
-        }                
-                ses.1<-ldply(ses,data.frame)
-        write.table(ses.1[,1:3],file="ok.7",sep="\t")
-        
-}
-
-
-rankall<- function (outcome,num="best") {
-        outcome.data<- read.table("outcome-of-care-measures.csv",
-                                  header=T,
-                                  na.strings ="NA", 
-                                  sep=",")
-        suppressWarnings(outcome.data[,c(11:46)] <- sapply(c(11:46), function(X) {
-                outcome.data[,X] <- as.numeric(
-                        gsub("Not Available",
-                             NA,
-                             outcome.data[,X])
-                )
-        }))
-        outcome.p<-paste("Hospital.30.Day.Death..Mortality..Rates.from",
-                         outcome,
-                         sep=".")
-        outcome.p.col<-match(outcome.p,names(outcome.data)) 
-        y<-outcome.p.col
-        y<-is.na(y)
-        if (y==TRUE) {
-                stop("invalid outcome")
-        } 
-        outcome.data.1<-outcome.data[,c("State", "Hospital.Name", outcome.p)]
-        good<-complete.cases(outcome.data.1[,outcome.p])
-        
-        outcome.data.1<-outcome.data.1[good,]
-        outcome.data.2=transform(outcome.data.1, 
-                                 rankouk=ave(outcome.data.1[,3],outcome.data.1[,1],
-                                             FUN= function(x) rank(x,
-                                                                   ties.method="first")))
         if(num=="worst"){
-                lapply(outcome.data.2.sp, function (x) sort(x[x$rankouk,], decreasing=TRUE))
-       
-        } 
-        
+        outcome.data.2=transform(outcome.data.1, 
+                                 rankouk=ave(outcome.data.1[,3],outcome.data.1[,1],
+                                             FUN= function(x) rank(-x,
+                                                                   ties.method="first")))
         outcome.data.2.sp<-split(outcome.data.2,outcome.data.2$State) 
         ses=lapply(outcome.data.2.sp, 
                    function(outcome.data.2.sp) subset(outcome.data.2.sp,
-                                                      rankouk==num,
+                                                      rankouk==1,
                                                       select=c("Hospital.Name","State","rankouk")))    
         ses.1<-ldply(ses,data.frame)
+        
+}        
 
-
-        }
-
- 
+        write.table(ses.1[,1:3],file="ok.7",sep="\t")
+}
+******************************************************************************************************
+        
